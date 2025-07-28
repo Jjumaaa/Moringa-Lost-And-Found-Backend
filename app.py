@@ -159,3 +159,224 @@ def claim_item():
     db.session.commit()
     log_admin_action(admin_id, f"Created claim on item #{data['item_id']}")
     return jsonify(claim.to_dict()), 201
+@app.route('/claims/<int:id>/approve', methods=['PATCH'])
+@admin_only
+def approve_claim(id):
+    claim = Claim.query.get_or_404(id)
+    claim.status = "approved"
+    claim.approved_by = get_jwt_identity()
+    db.session.commit()
+    log_admin_action(claim.approved_by, f"Approved claim #{id}")
+    return jsonify(claim.to_dict()), 200
+
+@app.route('/comments', methods=['POST'])
+@jwt_required()
+def create_comment():
+    data = request.get_json()
+    comment = Comment(
+        content=data['content'],
+        user_id=get_jwt_identity(),
+        item_id=data['item_id']
+    )
+    db.session.add(comment)
+    db.session.commit()
+    return jsonify(comment.to_dict()), 201
+
+@app.route('/comments/<int:id>', methods=['PATCH'])
+@jwt_required()
+def edit_comment(id):
+    data = request.get_json()
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    comment = Comment.query.get_or_404(id)
+    if comment.user_id != user_id and user.role != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    if 'content' in data:
+        comment.content = data['content']
+        db.session.commit()
+    return jsonify(comment.to_dict()), 200
+
+@app.route('/comments', methods=['GET'])
+def get_comments():
+    return jsonify([c.to_dict() for c in Comment.query.all()]), 200
+
+@app.route('/comments/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    comment = Comment.query.get_or_404(id)
+    if comment.user_id != user_id and user.role != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify({"message": "Comment deleted"}), 204
+
+@app.route('/rewards', methods=['POST'])
+@jwt_required()
+def offer_reward():
+    data = request.get_json()
+    reward = Reward(
+        item_id=data['item_id'],
+        amount=data['amount'],
+        offered_by_id=get_jwt_identity()
+    )
+    db.session.add(reward)
+    db.session.commit()
+    return jsonify(reward.to_dict()), 201
+
+@app.route('/rewards/<int:id>/pay', methods=['PATCH'])
+@jwt_required()
+def pay_reward(id):
+    reward = Reward.query.get_or_404(id)
+    reward.status = "paid"
+    reward.received_by_id = get_jwt_identity()
+    reward.paid_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify(reward.to_dict()), 200
+
+@app.route('/rewards/history', methods=['GET'])
+@jwt_required()
+def reward_history():
+    user_id = get_jwt_identity()
+    offered = [r.to_dict() for r in Reward.query.filter_by(offered_by_id=user_id)]
+    received = [r.to_dict() for r in Reward.query.filter_by(received_by_id=user_id)]
+    return jsonify({"offered": offered, "received": received}), 200
+
+@app.route('/images', methods=['POST'])
+@jwt_required()
+def upload_image():
+    data = request.get_json()@app.route('/claims/<int:id>/approve', methods=['PATCH'])
+@admin_only
+def approve_claim(id):
+    claim = Claim.query.get_or_404(id)
+    claim.status = "approved"
+    claim.approved_by = get_jwt_identity()
+    db.session.commit()
+    log_admin_action(claim.approved_by, f"Approved claim #{id}")
+    return jsonify(claim.to_dict()), 200
+
+@app.route('/comments', methods=['POST'])
+@jwt_required()
+def create_comment():
+    data = request.get_json()
+    comment = Comment(
+        content=data['content'],
+        user_id=get_jwt_identity(),
+        item_id=data['item_id']
+    )
+    db.session.add(comment)
+    db.session.commit()
+    return jsonify(comment.to_dict()), 201
+
+@app.route('/comments/<int:id>', methods=['PATCH'])
+@jwt_required()
+def edit_comment(id):
+    data = request.get_json()
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    comment = Comment.query.get_or_404(id)
+    if comment.user_id != user_id and user.role != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    if 'content' in data:
+        comment.content = data['content']
+        db.session.commit()
+    return jsonify(comment.to_dict()), 200
+
+@app.route('/comments', methods=['GET'])
+def get_comments():
+    return jsonify([c.to_dict() for c in Comment.query.all()]), 200
+
+@app.route('/comments/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    comment = Comment.query.get_or_404(id)
+    if comment.user_id != user_id and user.role != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify({"message": "Comment deleted"}), 204
+
+@app.route('/rewards', methods=['POST'])
+@jwt_required()
+def offer_reward():
+    data = request.get_json()
+    reward = Reward(
+        item_id=data['item_id'],
+        amount=data['amount'],
+        offered_by_id=get_jwt_identity()
+    )
+    db.session.add(reward)
+    db.session.commit()
+    return jsonify(reward.to_dict()), 201
+
+@app.route('/rewards/<int:id>/pay', methods=['PATCH'])
+@jwt_required()
+def pay_reward(id):
+    reward = Reward.query.get_or_404(id)
+    reward.status = "paid"
+    reward.received_by_id = get_jwt_identity()
+    reward.paid_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify(reward.to_dict()), 200
+
+@app.route('/rewards/history', methods=['GET'])
+@jwt_required()
+def reward_history():
+    user_id = get_jwt_identity()
+    offered = [r.to_dict() for r in Reward.query.filter_by(offered_by_id=user_id)]
+    received = [r.to_dict() for r in Reward.query.filter_by(received_by_id=user_id)]
+    return jsonify({"offered": offered, "received": received}), 200
+
+@app.route('/images', methods=['POST'])
+@jwt_required()
+def upload_image():
+    data = request.get_json()
+    image = Image(
+        item_id=data['item_id'],
+        image_url=data['image_url'],
+        uploaded_by=get_jwt_identity()
+    )
+    db.session.add(image)
+    db.session.commit()
+    return jsonify(image.to_dict()), 201
+
+@app.route('/images/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_image(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    image = Image.query.get_or_404(id)
+    if image.uploaded_by != user_id and user.role != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    db.session.delete(image)
+    db.session.commit()
+    return jsonify({"message": "Image deleted"}), 204
+
+if name == 'main':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+    image = Image(
+        item_id=data['item_id'],
+        image_url=data['image_url'],
+        uploaded_by=get_jwt_identity()
+    )
+    db.session.add(image)
+    db.session.commit()
+    return jsonify(image.to_dict()), 201
+
+@app.route('/images/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_image(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    image = Image.query.get_or_404(id)
+    if image.uploaded_by != user_id and user.role != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    db.session.delete(image)
+    db.session.commit()
+    return jsonify({"message": "Image deleted"}), 204
+
+if name == 'main':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
