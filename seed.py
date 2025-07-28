@@ -70,5 +70,21 @@ def seed():
         db.session.add(claim)
 
     db.session.commit()
+    print(" Creating rewards...")
+    for _ in range(8):
+        item = random.choice(items)
+        reward = Reward(
+            item_id=item.id,
+            offered_by_id=random.choice(users).id,
+            received_by_id=random.choice(users).id,
+            amount=round(random.uniform(10, 100), 2),
+            status=random.choice(["offered", "paid"]),
+            paid_at=fake.date_time_between(start_date='-15d', end_date='now')
+            if random.random() > 0.5 else None
+        )
+        db.session.add(reward)
+
+    db.session.commit()
+
 
       
