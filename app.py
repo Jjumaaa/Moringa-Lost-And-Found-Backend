@@ -95,3 +95,27 @@ def update_profile():
                 setattr(user, field, data[field])
     db.session.commit()
     return jsonify(user.to_dict()), 200
+@app.route('/users', methods=['GET'])
+@admin_only
+def get_users():
+    return jsonify([u.to_dict() for u in User.query.all()]), 200
+
+@app.route('/items', methods=['GET'])
+def get_items():
+    return jsonify([item.to_dict() for item in Item.query.all()]), 200
+
+@app.route('/items', methods=['POST'])
+@jwt_required()
+def report_item():
+    data = request.get_json()
+    user_id = get_jwt_identity()
+    item = Item(
+        name=data['name'],
+        description=data.get('description'),
+        status='lost',
+        location=data.get('location'),
+        reporter_id=user_id
+    )
+    db.session.add(item)
+    db.session.commit()
+    return jsonify(item.to_dict()), 201
