@@ -119,3 +119,43 @@ def report_item():
     db.session.add(item)
     db.session.commit()
     return jsonify(item.to_dict()), 201
+@app.route('/items/<int:id>', methods=['GET'])
+def get_item(id):
+    print("Route hit: /items/<int:id>")
+    item = Item.query.get_or_404(id)
+    return jsonify(item.to_dict()), 200
+
+@app.route('/items/<int:id>', methods=['PATCH'])
+@jwt_required()
+def update_item(id):
+    item = Item.query.get_or_404(id)
+    data = request.get_json()
+    user_id = get_jwt_identity()
+
+if "status" in data and data["status"].lower() == "found":
+    print(f"Notification: Item '{item.name}' marked as FOUND for reporter {item.reporter.username}")
+
+for field in ['name', 'description', 'status', 'location']:
+    if field in data:
+        setattr(item, field, data[field])
+db.session.commit()
+return jsonify(item.to_dict()), 200
+@app.route('/items/<int:id>', methods=['DELETE'])
+@admin_only
+def delete_item(id):
+    item = Item.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    log_admin_action(get_jwt_identity(), f"Deleted item #{id}")
+    return jsonify({"message": "Item deleted"}), 204
+
+@app.route('/claims', methods=['POST'])
+@admin_only
+def claim_item():
+    data = request.get_json()
+    admin_id = get_jwt_identity()
+    claim = Claim(item_id=data['item_id'], claimant_id=admin_id)
+    db.session.add(claim)
+    db.session.commit()
+    log_admin_action(admin_id, f"Created claim on item #{data['item_id']}")
+    return jsonify(claim.to_dict()), 201
