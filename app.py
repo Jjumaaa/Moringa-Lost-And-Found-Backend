@@ -44,3 +44,24 @@ def admin_only(fn):
 def log_admin_action(admin_id, action_desc):
     admin = User.query.get(admin_id)
     print(f"[ADMIN LOG] {datetime.utcnow()} - {admin.username} ({admin.id}) - {action_desc}")
+@app.route('/')
+def index():
+    return "Bruh no need to worry these routes are purfeeect just look into the read me !."
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role', 'user')
+    if not username or not password:
+        return jsonify({"error": "Username and password needed"}), 400
+    if User.query.filter_by(username=username).first():
+        return jsonify({"error": "Username already taken"}), 400
+    user = User(username=username, email=email, role=role)
+    user.password_hash = password
+    db.session.add(user)
+    db.session.commit()
+    token = create_access_token(identity=user.id)
+    return jsonify({"user": user.to_dict(), "token": token}), 201
