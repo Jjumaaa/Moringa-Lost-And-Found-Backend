@@ -98,7 +98,7 @@ def seed():
     db.session.commit()
 
     print(" Done seeding the database!")
-if name == "main":
+if __name__ == "main":
     seed()
 
 
