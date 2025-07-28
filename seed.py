@@ -31,4 +31,21 @@ def seed():
         db.session.add(user)
 
     db.session.commit()
+    print(" Creating items...")
+    items = []
+    for _ in range(15):
+        item = Item(
+            name=fake.word().capitalize() + " " + fake.word().capitalize(),
+            description=fake.sentence(),
+            status=random.choice(["lost", "found"]),
+            location=fake.city(),
+            date_reported=fake.date_time_between(start_date='-30d', end_date='now'),
+            reporter_id=random.choice(users).id,
+            inventory_admin_id=random.choice(users).id
+        )
+        items.append(item)
+        db.session.add(item)
+
+    db.session.commit()
+
       
