@@ -77,3 +77,44 @@ class Item(db.Model):
             "reward": self.reward.to_dict() if self.reward else None,
             "images": [img.to_dict() for img in self.images]
         }
+    
+class Claim(db.Model):
+    __tablename__ = "claims"
+
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    claimant_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String, default="pending")
+    claimed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    approved_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    claimant = relationship('User', foreign_keys=[claimant_id], backref='claims')
+    approver = relationship('User', foreign_keys=[approved_by], backref='claims_approved')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "item_id": self.item_id,
+            "claimant": self.claimant.to_dict() if self.claimant else None,
+            "status": self.status,
+            "claimed_at": self.claimed_at.isoformat() if self.claimed_at else None,
+            "approved_by": self.approver.to_dict() if getattr(self, 'approver', None) else None
+        }
+    
+class Comment(db.Model):
+    __tablename__ = "comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "user": self.user.to_dict() if self.user else None,
+            "item_id": self.item_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
