@@ -17,4 +17,18 @@ def seed():
     db.session.query(Item).delete()
     db.session.query(User).delete()
     db.session.commit()
+
+    print(" Creating users...")
+    users = []
+    for _ in range(10):
+        user = User(
+            username=fake.user_name(),
+            email=fake.email(),
+            role=random.choice(["user", "admin"]),
+        )
+        user.password_hash = "password123"
+        users.append(user)
+        db.session.add(user)
+
+    db.session.commit()
       
