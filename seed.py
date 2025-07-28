@@ -47,5 +47,16 @@ def seed():
         db.session.add(item)
 
     db.session.commit()
+    print("Creating comments...")
+    for _ in range(20):
+        comment = Comment(
+            content=fake.sentence(),
+            user_id=random.choice(users).id,
+            item_id=random.choice(items).id,
+            created_at=fake.date_time_between(start_date='-30d', end_date='now')
+        )
+        db.session.add(comment)
+
+    db.session.commit()
 
       
