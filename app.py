@@ -65,3 +65,33 @@ def register():
     db.session.commit()
     token = create_access_token(identity=user.id)
     return jsonify({"user": user.to_dict(), "token": token}), 201
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    user = User.query.filter_by(username=username).first()
+    if user and user.authenticate(password):
+        token = create_access_token(identity=user.id)
+        return jsonify({"user": user.to_dict(), "token": token}), 200
+    return jsonify({"error": "Invalid username or password"}), 401
+
+@app.route('/me', methods=['GET'])
+@jwt_required()
+def me():
+    user = User.query.get(get_jwt_identity())
+    return jsonify(user.to_dict()), 200
+
+@app.route('/users/me', methods=['PATCH'])
+@jwt_required()
+def update_profile():
+    data = request.get_json()
+    user = User.query.get(get_jwt_identity())
+    for field in ['username', 'email', 'password']:
+        if field in data:
+            if field == 'password':
+                user.password_hash = data['password']
+            else:
+                setattr(user, field, data[field])
+    db.session.commit()
+    return jsonify(user.to_dict()), 200
