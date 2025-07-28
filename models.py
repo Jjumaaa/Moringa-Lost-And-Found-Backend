@@ -44,3 +44,36 @@ class User(db.Model):
             "email": self.email,
             "role": self.role
         }
+class Item(db.Model):
+    __tablename__ = "items"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String)
+    status = db.Column(db.String, default='lost')
+    location = db.Column(db.String)
+    date_reported = db.Column(db.DateTime, default=datetime.utcnow)
+
+    reporter_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    inventory_admin_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    comments = relationship('Comment', backref='item', cascade='all, delete-orphan')
+    claims = relationship('Claim', backref='item', cascade='all, delete-orphan')
+    reward = relationship('Reward', uselist=False, backref='item', cascade='all, delete-orphan')
+    images = relationship('Image', backref='item', cascade='all, delete-orphan')
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "status": self.status,
+            "location": self.location,
+            "date_reported": self.date_reported.isoformat() if self.date_reported else None,
+            "reporter": self.reporter.to_dict() if self.reporter else None,
+            "inventory_admin_id": self.inventory_admin_id,
+            "comments": [c.to_dict() for c in self.comments],
+            "claims": [c.to_dict() for c in self.claims],
+            "reward": self.reward.to_dict() if self.reward else None,
+            "images": [img.to_dict() for img in self.images]
+        }
