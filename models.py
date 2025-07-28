@@ -143,3 +143,21 @@ class Reward(db.Model):
             "status": self.status,
             "paid_at": self.paid_at.isoformat() if self.paid_at else None
         }
+    
+class Image(db.Model):
+    __tablename__ = "images"
+
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    image_url = db.Column(db.String, nullable=False)
+    uploaded_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "item_id": self.item_id,
+            "image_url": self.image_url,
+            "uploaded_by": self.uploaded_by,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
