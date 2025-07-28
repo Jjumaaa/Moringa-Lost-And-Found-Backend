@@ -85,6 +85,21 @@ def seed():
         db.session.add(reward)
 
     db.session.commit()
+    print("Creating images...")
+    for _ in range(15):
+        image = Image(
+            item_id=random.choice(items).id,
+            image_url=fake.image_url(),
+            uploaded_by=random.choice(users).id,
+            created_at=fake.date_time_between(start_date='-30d', end_date='now')
+        )
+        db.session.add(image)
+
+    db.session.commit()
+
+    print(" Done seeding the database!")
+if name == "main":
+    seed()
 
 
       
