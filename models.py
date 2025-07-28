@@ -118,3 +118,28 @@ class Comment(db.Model):
             "item_id": self.item_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+
+class Reward(db.Model):
+    __tablename__ = "rewards"
+
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    offered_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    received_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String, default="offered")
+    paid_at = db.Column(db.DateTime, nullable=True)
+
+    offered_by_user = relationship('User', foreign_keys=[offered_by_id], backref='rewards_offered')
+    received_by_user = relationship('User', foreign_keys=[received_by_id], backref='rewards_received')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "item_id": self.item_id,
+            "offered_by": self.offered_by_user.to_dict() if self.offered_by_user else None,
+            "received_by": self.received_by_user.to_dict() if self.received_by_user else None,
+            "amount": self.amount,
+            "status": self.status,
+            "paid_at": self.paid_at.isoformat() if self.paid_at else None
+        }
