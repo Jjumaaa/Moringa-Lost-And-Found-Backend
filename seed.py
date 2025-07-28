@@ -58,5 +58,17 @@ def seed():
         db.session.add(comment)
 
     db.session.commit()
+    print(" Creating claims...")
+    for _ in range(10):
+        claim = Claim(
+            item_id=random.choice(items).id,
+            claimant_id=random.choice(users).id,
+            status=random.choice(["pending", "approved", "rejected"]),
+            claimed_at=fake.date_time_between(start_date='-20d', end_date='now'),
+            approved_by=random.choice(users).id
+        )
+        db.session.add(claim)
+
+    db.session.commit()
 
       
