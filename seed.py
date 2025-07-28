@@ -6,3 +6,6 @@ import random
 from datetime import datetime, timedelta
 
 fake = Faker()
+
+def seed():
+    with app.app_context():
