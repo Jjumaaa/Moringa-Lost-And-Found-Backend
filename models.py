@@ -44,6 +44,8 @@ class User(db.Model):
             "email": self.email,
             "role": self.role
         }
+
+
 class Item(db.Model):
     __tablename__ = "items"
 
@@ -61,7 +63,7 @@ class Item(db.Model):
     claims = relationship('Claim', backref='item', cascade='all, delete-orphan')
     reward = relationship('Reward', uselist=False, backref='item', cascade='all, delete-orphan')
     images = relationship('Image', backref='item', cascade='all, delete-orphan')
-    
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -77,7 +79,8 @@ class Item(db.Model):
             "reward": self.reward.to_dict() if self.reward else None,
             "images": [img.to_dict() for img in self.images]
         }
-    
+
+
 class Claim(db.Model):
     __tablename__ = "claims"
 
@@ -100,7 +103,8 @@ class Claim(db.Model):
             "claimed_at": self.claimed_at.isoformat() if self.claimed_at else None,
             "approved_by": self.approver.to_dict() if getattr(self, 'approver', None) else None
         }
-    
+
+
 class Comment(db.Model):
     __tablename__ = "comments"
 
@@ -118,6 +122,7 @@ class Comment(db.Model):
             "item_id": self.item_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+
 
 class Reward(db.Model):
     __tablename__ = "rewards"
@@ -143,7 +148,8 @@ class Reward(db.Model):
             "status": self.status,
             "paid_at": self.paid_at.isoformat() if self.paid_at else None
         }
-    
+
+
 class Image(db.Model):
     __tablename__ = "images"
 
