@@ -21,7 +21,7 @@ pyjwt = "*"
 [dev-packages]
 
 [requires]
-python_version = "3.11"
+python_version = "3.8"
 
 [[source]]
 url = "https://pypi.org/simple"
