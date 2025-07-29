@@ -13,8 +13,77 @@ Authorization: Bearer <your_jwt_token_here>
 ## Available Routes
 Here are the routes defined in your Flask app:
 
+## Moringa Lost and found Backend 
 
----
+
+A **Flask REST API** 
+for managing users, admins, lost objects
+
+## Setup
+
+1. Clone the repository at:
+
+   ```bash
+   https://github.com/Jjumaaa/Moringa-Lost-And-Found-Backend
+   Then, cd Moringa-Lost-And-Found-Backend
+   ```
+2. Install dependencies:
+
+   ```bash
+   pipenv install
+   pipenv shell
+   ```
+
+## Environment Variables
+
+Create a `.env` file:
+
+```bash
+FLASK_APP=app.py
+FLASK_ENV=development
+SECRET_KEY=super-secret-key
+DATABASE_URL=sqlite:///moringa.db
+```
+
+## Dependencies
+
+Install them with =pipenv "The dependency you want"
+
+* flask
+* flask-sqlalchemy
+* flask-migrate
+* flask-jwt-extended
+* psycopg2-binary
+* pipenv
+* shell
+* faker
+* alembic
+* flask-cors
+* sqlalchemy
+* serializer
+* sqlalchemy-serializer
+* flask-bcrypt
+* flask-restful
+
+## Database Migrations
+
+```bash
+alembic init alembic
+alembic revision --autogenerate -m "created all tables"
+alembic upgrade head
+```
+
+## Seeding the Database
+
+```bash
+python seed.py
+```
+
+## Run the Server
+
+```bash
+python app.py
+```
 
 ##  Auth Routes
 
