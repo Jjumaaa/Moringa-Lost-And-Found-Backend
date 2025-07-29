@@ -277,4 +277,4 @@ def delete_image(id):
     return jsonify({"message": "Image deleted"}), 204
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+    app.run(port=5555, debug=True)
