@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app,
      origins=[
          "http://localhost:3000",
-         "https://lost-now-found.vercel.app"
+         "https://moringa-lost-and-found-frontend.vercel.app"
      ],
      supports_credentials=True)
 
